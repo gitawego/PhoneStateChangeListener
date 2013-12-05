@@ -32,7 +32,7 @@ stop the watcher
 ```js
 navigator.phoneStateChangeListener.unwatch(function(err){
     if(err){
-        throw new Error('something goes wrong while deactivating the BroadcastReceiver');
+        throw new Error('something goes wrong while desactivating the BroadcastReceiver');
     }
 });
 ```
