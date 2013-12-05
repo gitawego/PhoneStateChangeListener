@@ -10,10 +10,10 @@
  * 	Based upon PhoneListener by authored by Tommy-Carlos Williams <https://github.com/devgeeks>
  * 
  */
-package com.szanata.cordova.plugins;
+package com.szanata.cordova.phonestatechangelistener;
 
-import org.apache.cordova.api.CallbackContext;
-import org.apache.cordova.api.CordovaPlugin;
+import org.apache.cordova.CallbackContext;
+import org.apache.cordova.CordovaPlugin;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -23,7 +23,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.telephony.TelephonyManager;
-import android.util.Log;
 
 /**
  * 
@@ -34,7 +33,6 @@ public class PhoneStateChangeListener extends CordovaPlugin {
 	private static final String TAG = "PhoneStateChangeListener";
 	private final String NONE = "NONE";
 	private Context context;
-	private CallbackContext callbackContext;
 	private BroadcastReceiver receiver = null;
 	
 	/**
@@ -47,12 +45,11 @@ public class PhoneStateChangeListener extends CordovaPlugin {
 		this.context = cordova.getActivity().getApplicationContext();
 		
 		if ("start".equals(action)) {
-			this.callbackContext = callbackContext;
-			startPhoneListener();
+			startPhoneListener(callbackContext);
 			return true;
 			
 		}else if ("stop".equals(action)) {
-			removePhoneListener();
+			removePhoneListener(callbackContext);
 			this.callbackContext = null;
 			return true;
 		}
@@ -63,7 +60,7 @@ public class PhoneStateChangeListener extends CordovaPlugin {
 	/**
 	 * creates a new BroadcastReceiver to listen whether the Telephony State changes
 	 */
-	public void startPhoneListener() {
+	public void startPhoneListener(final CallbackContext callbackContext) {
 		
 		if (this.receiver == null) {
 			this.receiver = new BroadcastReceiver() {
@@ -78,14 +75,16 @@ public class PhoneStateChangeListener extends CordovaPlugin {
 						if (state.equals(TelephonyManager.EXTRA_STATE_RINGING)){
 							number = intent.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER);
 						}
-						if (callbackContext != null){
-							final JSONObject data = new JSONObject();
-							try{
-								data.put("state", state);
-								data.put("number", number);
-							}catch(final JSONException e){};
+						
+						final JSONObject data = new JSONObject();
+						try{
+							data.put("state", state);
+							data.put("number", number);
 							callbackContext.success(data);
+						}catch(final JSONException e){
+							callbackContext.error(e.getMessage());
 						}
+						
 					}
 				}
 			};
@@ -98,13 +97,14 @@ public class PhoneStateChangeListener extends CordovaPlugin {
 	/**
 	 * removes the Receiver
 	 */
-	private void removePhoneListener() {
+	private void removePhoneListener(final CallbackContext callbackContext) {
 		if (this.receiver != null) {
 			try {
 				this.context.unregisterReceiver(this.receiver);
 				this.receiver = null;
+				callbackContext.success();
 			} catch (final Exception e) {
-				Log.e(TAG, "Error unregistering phone listener receiver: " + e.getMessage(), e);
+				callbackContext.error(e.getMessage());
 			}
 		}
 	}

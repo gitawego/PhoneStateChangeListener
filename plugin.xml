@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin id="com.szanata.cordova.phonestatechangelistener" version="0.2.1" xmlns="http://apache.org/cordova/ns/plugins/1.0">
+    <name>PhoneStateChangeListener</name>
+    <description>Attach Phone state change event to DOM for Android</description>
+    <license>Apache 2.0</license>
+    <keywords>cordova,phone,state,event</keywords>
+    <repo>https://github.com/gitawego/PhoneStateChangeListener.git</repo>
+    
+    <!-- android -->
+    <platform name="android">
+        <config-file target="res/xml/config.xml" parent="/*">
+            <feature name="PhoneStateChangeListener">
+                <param name="android-package" value="com.szanata.cordova.phonestatechangelistener.PhoneStateChangeListener" />
+            </feature>
+        </config-file>
+        <source-file src="src/android/PhoneStateChangeListener.java" target-dir="src/com/szanata/cordova/phonestatechangelistener" />
+
+        <js-module src="www/PhoneStateChangeListener.js" name="phoneStateChangeListener">
+            <merges target="navigator.phoneStateChangeListener" />
+        </js-module>
+    </platform>
+</plugin>
